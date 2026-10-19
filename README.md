@@ -4,7 +4,7 @@ What the Town of Bluffton's own records show about its Flock Safety camera netwo
 
 Open `index.html` in a browser (or turn on GitHub Pages for this repo) to get:
 
-- **The strongest points**: 14 talking points, ranked by how solid the paper trail is.
+- **The strongest points**: 16 talking points, ranked by how solid the paper trail is.
 - **The story, step by step**: seven chapters in date order, April 2023 to July 2026.
 - **All records**: a searchable index of 198 records.
 - **What to request next**: gaps the next FOIA requests should fill.
