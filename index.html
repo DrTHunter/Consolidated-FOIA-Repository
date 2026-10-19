@@ -1,0 +1,394 @@
+<title>Bluffton Flock Files</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@500;700&family=Public+Sans:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a public-records case file. Sticky search bar, ranked findings, dated story, full record index, slide-over document reader. */
+:root{
+  --paper:#eef1f4; --surface:#ffffff; --ink:#15212c; --muted:#56656f; --rule:#cfd7de;
+  --accent:#1d4f7a; --accent-ink:#ffffff; --mark:#ffe169; --mark-ink:#15212c; --alert:#9b2a1e; --redact:#15212c;
+  --display:"Zilla Slab", Rockwell, "Roboto Slab", Georgia, serif;
+  --body:"Public Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, Consolas, monospace;
+  --shadow:0 18px 50px rgba(15,30,45,.22);
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --paper:#0e151c; --surface:#16202a; --ink:#e3e9ee; --muted:#93a2ae; --rule:#273542;
+  --accent:#8db9e4; --accent-ink:#0e151c; --mark:#c9a91d; --mark-ink:#0e151c; --alert:#ff8c7a; --redact:#000;
+  --shadow:0 18px 50px rgba(0,0,0,.6); color-scheme:dark }}
+:root[data-theme="dark"]{
+  --paper:#0e151c; --surface:#16202a; --ink:#e3e9ee; --muted:#93a2ae; --rule:#273542;
+  --accent:#8db9e4; --accent-ink:#0e151c; --mark:#c9a91d; --mark-ink:#0e151c; --alert:#ff8c7a; --redact:#000;
+  --shadow:0 18px 50px rgba(0,0,0,.6); color-scheme:dark }
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--paper);color:var(--ink);font:16px/1.6 var(--body);margin:0}
+.wrap{max-width:1040px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;line-height:1.15;margin:0}
+a{color:var(--accent)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:3px}
+.mono{font-family:var(--mono);font-size:.8rem;letter-spacing:.02em}
+.label{font-family:var(--mono);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+mark{background:var(--mark);color:var(--mark-ink);padding:0 .12em;border-radius:2px}
+
+/* top bar */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--paper);border-bottom:1px solid var(--rule)}
+.bar .wrap{display:flex;gap:12px 20px;align-items:center;flex-wrap:wrap;padding-block:10px}
+.brand{font-family:var(--display);font-weight:700;font-size:1.15rem;white-space:nowrap;text-decoration:none;color:var(--ink)}
+.brand span{color:var(--alert)}
+.search{flex:1 1 260px;display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--rule);border-radius:6px;padding:0 10px}
+.search input{flex:1;min-width:0;border:0;background:transparent;color:var(--ink);font:inherit;padding:9px 0;outline:none}
+.search:focus-within{border-color:var(--accent);box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 30%,transparent)}
+.nav{display:flex;gap:14px;flex-wrap:wrap}
+.nav a{font-size:.88rem;font-weight:600;text-decoration:none;color:var(--muted)}
+.nav a:hover{color:var(--ink)}
+
+/* hero */
+header.hero{padding-block:44px 30px}
+.hero h1{font-size:clamp(2rem,5vw,3.3rem);max-width:18ch}
+.hero h1 .struck{position:relative;white-space:nowrap}
+.hero h1 .struck::after{content:"";position:absolute;left:-2px;right:-2px;top:52%;height:.5em;transform:translateY(-50%);background:var(--redact);opacity:.9}
+.hero p.lede{font-size:1.12rem;max-width:62ch;color:var(--muted);margin:16px 0 0}
+.facts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:8px;overflow:hidden;margin-top:28px}
+.fact{background:var(--surface);padding:14px 16px;display:flex;flex-direction:column;gap:2px;cursor:pointer;border:0;text-align:left;color:inherit;font:inherit}
+.fact:hover{background:color-mix(in srgb,var(--surface) 85%,var(--accent))}
+.fact b{font-family:var(--display);font-size:1.8rem;font-variant-numeric:tabular-nums;line-height:1.1}
+.fact span{font-size:.85rem;color:var(--muted)}
+@media (max-width:720px){.facts{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.howto{margin-top:18px;font-size:.92rem;color:var(--muted)}
+
+section{padding-block:36px}
+section,.point,.chapter,#top{scroll-margin-top:120px}
+.fact.flash,.cite.flash{position:relative}
+.sechead{display:flex;flex-direction:column;gap:6px;margin-bottom:22px;border-top:3px solid var(--ink);padding-top:14px}
+.sechead h2{font-size:clamp(1.6rem,3.5vw,2.2rem)}
+.sechead p{margin:0;color:var(--muted);max-width:62ch}
+
+/* points */
+.points{display:flex;flex-direction:column;gap:16px;counter-reset:pt}
+.point{background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:20px 22px;display:grid;grid-template-columns:3.2rem minmax(0,1fr);gap:4px 16px}
+.point .rank{font-family:var(--display);font-weight:700;font-size:2.2rem;color:var(--alert);line-height:1;font-variant-numeric:tabular-nums}
+.point h3{font-size:1.45rem}
+.point .plain{margin:8px 0 0;max-width:68ch}
+.point .why{margin:10px 0 0;font-weight:600;max-width:68ch}
+.point .why::before{content:"Why it matters  ";font-family:var(--mono);font-weight:500;font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--alert)}
+.evidence{grid-column:2;margin:14px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px;border-left:2px solid var(--rule);padding-left:14px}
+.evidence li{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline}
+.evidence q{quotes:"\201C" "\201D";font-style:italic}
+.cite{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:.74rem;padding:2px 8px;border-radius:4px;border:1px solid var(--accent);background:transparent;color:var(--accent);cursor:pointer;white-space:nowrap}
+.cite:hover{background:var(--accent);color:var(--accent-ink)}
+.cite::before{content:"";width:9px;height:11px;border:1.5px solid currentColor;border-radius:1px;flex:none}
+.point.minor{padding:16px 22px}
+.point.minor h3{font-size:1.2rem}
+.more{margin-top:8px}
+@media (max-width:560px){.point{grid-template-columns:1fr}.evidence{grid-column:1}.point .rank{font-size:1.6rem}}
+
+/* story */
+.chapters{display:flex;flex-direction:column;gap:34px}
+.chapter h3{font-size:1.5rem}
+.chapter .span{margin-top:2px}
+.chapter .intro{margin:6px 0 14px;color:var(--muted);max-width:62ch}
+.entries{list-style:none;margin:0;padding:0;border-left:2px solid var(--rule);margin-left:6px}
+.entry{position:relative;padding:0 0 18px 22px;display:grid;grid-template-columns:8.5rem minmax(0,1fr);gap:2px 18px}
+.entry::before{content:"";position:absolute;left:-7px;top:.45em;width:12px;height:12px;border-radius:50%;background:var(--paper);border:2px solid var(--accent)}
+.entry time{font-family:var(--mono);font-size:.8rem;color:var(--muted);padding-top:.15em;font-variant-numeric:tabular-nums}
+.entry p{margin:0;max-width:64ch}
+.entry .cites{grid-column:2;display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+@media (max-width:560px){.entry{grid-template-columns:1fr}.entry .cites{grid-column:1}}
+
+/* records */
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.chip{font:600 .82rem var(--body);padding:5px 12px;border-radius:99px;border:1px solid var(--rule);background:var(--surface);color:var(--ink);cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.records{background:var(--surface);border:1px solid var(--rule);border-radius:8px;overflow:hidden}
+.rec{display:grid;grid-template-columns:6.6rem minmax(0,1fr) auto;gap:4px 14px;padding:11px 16px;border-top:1px solid var(--rule);width:100%;text-align:left;background:transparent;border-left:0;border-right:0;border-bottom:0;color:inherit;font:inherit;cursor:pointer}
+.rec:first-child{border-top:0}
+.rec:hover{background:color-mix(in srgb,var(--surface) 88%,var(--accent))}
+.rec time{font-family:var(--mono);font-size:.78rem;color:var(--muted);padding-top:.2em;font-variant-numeric:tabular-nums}
+.rec .t{font-weight:600;overflow-wrap:anywhere}
+.rec .s{font-size:.84rem;color:var(--muted);grid-column:2;overflow-wrap:anywhere}
+.rec .tag{font-family:var(--mono);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--alert);align-self:start;padding-top:.3em}
+@media (max-width:560px){.rec{grid-template-columns:1fr}.rec .s{grid-column:1}.rec .tag{order:-1}}
+.count{font-size:.88rem;color:var(--muted);margin:0 0 10px}
+
+/* search results */
+#results[hidden]+#main{display:block}
+#results{padding-block:28px}
+.rgroup{margin-bottom:26px}
+.rgroup h3{font-size:1.1rem;margin-bottom:10px}
+.hit{display:block;width:100%;text-align:left;background:var(--surface);border:1px solid var(--rule);border-radius:6px;padding:10px 14px;margin-bottom:8px;color:inherit;font:inherit;cursor:pointer}
+.hit:hover{border-color:var(--accent)}
+.hit .meta{font-family:var(--mono);font-size:.74rem;color:var(--muted)}
+.hit .snip{font-size:.9rem;margin-top:4px;overflow-wrap:anywhere}
+.empty{color:var(--muted)}
+
+/* lists */
+.list{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:10px;max-width:70ch}
+.list li .cite{margin-left:6px}
+.twocol{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:30px}
+@media (max-width:760px){.twocol{grid-template-columns:1fr}}
+.twocol h3{font-size:1.25rem;margin-bottom:12px}
+footer{padding-block:30px 60px;color:var(--muted);font-size:.88rem;border-top:1px solid var(--rule)}
+footer p{max-width:72ch}
+
+/* reader */
+.scrim{position:fixed;inset:0;background:rgba(10,18,26,.45);z-index:40}
+.reader{position:fixed;top:0;right:0;bottom:0;width:min(760px,100%);background:var(--surface);z-index:50;box-shadow:var(--shadow);display:flex;flex-direction:column;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);padding-right:env(safe-area-inset-right,0px)}
+.rhead{padding:14px 20px 14px;border-bottom:1px solid var(--rule);display:flex;flex-direction:column;gap:10px}
+.rtools{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.back{font:700 .95rem var(--body);background:var(--ink);color:var(--paper);border:0;border-radius:6px;padding:9px 14px;cursor:pointer}
+.back:hover{background:var(--accent);color:var(--accent-ink)}
+.orig{font:600 .88rem var(--body);padding:8px 12px;border:1px solid var(--accent);border-radius:6px;text-decoration:none}
+.rhead h2{font-size:1.35rem;overflow-wrap:anywhere}
+.rmeta{display:flex;flex-wrap:wrap;gap:4px 16px}
+.rbody{overflow:auto;padding:18px 20px 40px;flex:1;overscroll-behavior:contain}
+.pull{border-left:4px solid var(--mark);background:color-mix(in srgb,var(--mark) 18%,var(--surface));padding:10px 14px;margin:0 0 18px;border-radius:0 6px 6px 0}
+.pull .label{display:block;margin-bottom:4px}
+.doctext{white-space:pre-wrap;font-family:var(--body);font-size:.95rem;line-height:1.55;overflow-wrap:anywhere;margin:0}
+.nopdf{font-size:.85rem;color:var(--muted)}
+.flash{animation:flash 1.6s ease-out}
+@keyframes flash{0%{box-shadow:0 0 0 4px var(--mark)}100%{box-shadow:0 0 0 0 transparent}}
+@media (prefers-reduced-motion:reduce){.flash{animation:none}*{scroll-behavior:auto!important}}
+</style>
+
+<div class="bar">
+  <div class="wrap">
+    <a class="brand" href="#top">Bluffton <span>Flock</span> Files</a>
+    <label class="search" for="q">
+      <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M11 11l4 4" stroke="currentColor" stroke-width="2"/></svg>
+      <input id="q" type="search" placeholder="Search everything: SCDOT, HOA, password, FBI…" autocomplete="off" aria-label="Search the talking points, story, and all records">
+    </label>
+    <nav class="nav" aria-label="Sections">
+      <a href="#points">Top points</a><a href="#story">The story</a><a href="#records">All records</a><a href="#next">Next requests</a>
+    </nav>
+  </div>
+</div>
+
+<div id="top"></div>
+<section id="results" class="wrap" hidden aria-live="polite"></section>
+
+<main id="main">
+  <header class="hero wrap">
+    <p class="label">FOIA 20394 · FOIA 20363 · LECAC agendas &amp; minutes</p>
+    <h1>What Bluffton's own records say about its <span class="struck">Flock</span> camera network</h1>
+    <p class="lede">The Town released 1,167 emails between Bluffton Police and Flock Safety. We read all of them. Below are the strongest points first, then the whole story in order. Every claim links to the record it comes from.</p>
+    <div class="facts" id="facts"></div>
+    <p class="howto">Click any <span class="cite" style="cursor:default">source</span> button to open the record with the quoted words highlighted. Press <b>Back to where you were</b> (or your browser's back button) to return to the same spot.</p>
+  </header>
+
+  <section id="points" class="wrap">
+    <div class="sechead"><p class="label">Ranked by how solid the paper trail is</p><h2>The strongest points</h2><p>Each point is backed by the Town's or Flock's own words. Lead with the first five.</p></div>
+    <div class="points" id="pointlist"></div>
+  </section>
+
+  <section id="story" class="wrap">
+    <div class="sechead"><p class="label">April 2023 – July 2026</p><h2>The story, step by step</h2><p>Seven chapters, in date order, in plain language.</p></div>
+    <div class="chapters" id="chapters"></div>
+  </section>
+
+  <section id="records" class="wrap">
+    <div class="sechead"><p class="label">Searchable index</p><h2>All records</h2><p>Every substantive email thread in FOIA 20394 (duplicates and automated mailers removed), plus the agendas, minutes, and camera list. Use the search bar to search their full text.</p></div>
+    <div class="filters" id="filters"></div>
+    <p class="count" id="reccount"></p>
+    <div class="records" id="reclist"></div>
+  </section>
+
+  <section id="next" class="wrap">
+    <div class="sechead"><p class="label">Keep digging</p><h2>What to request next</h2><p>Gaps in this release that the next FOIA requests should fill.</p></div>
+    <div class="twocol">
+      <div><h3>Ask the Town for</h3><ol class="list" id="nextlist"></ol></div>
+      <div><h3>What these records don't show</h3><ul class="list" id="fairlist"></ul></div>
+    </div>
+  </section>
+</main>
+
+<footer class="wrap">
+  <p>Sources: Town of Bluffton FOIA 20394 (archive of 1,167 emails dated April 2023 to July 2026), FOIA 20363 (camera locations, July 6, 2026), LECAC agendas for Nov 14, 2024, Jan 9, 2025, and Mar 13, 2025, and LECAC minutes for Feb 8, 2024. Quotes are copied from the records; every quote on this page was checked by machine against the source text. One camera password and officers' phone numbers were blacked out. Email text has standard disclaimers and calendar boilerplate trimmed; the original PDF is linked wherever we cite a record.</p>
+</footer>
+
+<div class="scrim" id="scrim" hidden></div>
+<aside class="reader" id="reader" role="dialog" aria-modal="true" aria-labelledby="rtitle" hidden>
+  <div class="rhead">
+    <div class="rtools">
+      <button class="back" id="back" type="button">← Back to where you were</button>
+      <a class="orig" id="orig" target="_blank" rel="noopener">Open original PDF ↗</a>
+      <span class="nopdf" id="nopdf" hidden>Original is inside the FOIA 20394 package</span>
+    </div>
+    <h2 id="rtitle"></h2>
+    <div class="rmeta mono" id="rmeta"></div>
+  </div>
+  <div class="rbody" id="rbody" tabindex="-1">
+    <div class="pull" id="pull" hidden><span class="label">Quoted on this page</span><span id="pulltext"></span></div>
+    <pre class="doctext" id="doctext"></pre>
+  </div>
+</aside>
+
+<script src="data.js"></script>
+<script>
+(function(){
+const D = window.FLOCK, DOCS = D.docs;
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const fmt = d => { if(!d) return ""; const [y,m,dd] = d.split("-"); return `${MONTHS[+m-1]} ${+dd}, ${y}`; };
+const short = id => { const d = DOCS[id]; if(!d) return id; return (d.kind==="Email" ? "Email " + id.slice(1) : d.kind) + " · " + fmt(d.date); };
+
+// quote -> tolerant regex (whitespace and curly quotes)
+function qre(q){
+  const parts = q.trim().split(/\s+/).map(w => w.replace(/[.*+?^${}()|[\]\\]/g,"\\$&").replace(/['\u2019\u2018]/g,"['\u2019\u2018]").replace(/["\u201c\u201d]/g,'["\u201c\u201d]'));
+  return new RegExp(parts.join("\\s+"), "i");
+}
+const citeBtn = (id, q) => `<button type="button" class="cite" data-doc="${id}" data-q="${esc(q||"")}" title="Open ${esc(DOCS[id]?.title||id)}">${esc(short(id))}</button>`;
+
+// facts
+const facts = [
+  ["52","cameras contracted: 29 plate readers, 23 live video","e0313","Phase 2 shows 13 LPRs and 19 PTZs installed."],
+  ["98","existing Town cameras wired into Flock","e0234","I've successfully added 98 cameras from the list Bob provided."],
+  ["540+","outside camera networks shared with BPD","e0164","you have over 540 networks shared with you so far"],
+  ["4","cameras installed before the Town's go-ahead","e0877","Four cameras were already inadvertently installed"],
+];
+$("#facts").innerHTML = facts.map(f => `<button type="button" class="fact cite-like" data-doc="${f[2]}" data-q="${esc(f[3])}"><b>${f[0]}</b><span>${f[1]}</span></button>`).join("");
+
+// points
+$("#pointlist").innerHTML = D.points.map((p,i) => `
+  <article class="point ${i>=5?"minor":""}" id="${p.id}">
+    <div class="rank">${i+1}</div>
+    <div>
+      <h3>${esc(p.title)}</h3>
+      <p class="plain">${esc(p.plain)}</p>
+      <p class="why">${esc(p.why)}</p>
+    </div>
+    <ul class="evidence">${p.cites.map(([id,q]) => `<li>${q && !/^R-14$/.test(q) ? `<q>${esc(q)}</q>` : `<span>Officer user roster</span>`} ${citeBtn(id,q)}</li>`).join("")}</ul>
+  </article>`).join("");
+
+// story
+$("#chapters").innerHTML = D.story.map((c,i) => `
+  <div class="chapter" id="${c.id}">
+    <p class="label">Chapter ${i+1}</p>
+    <h3>${esc(c.title)}</h3>
+    <p class="mono span">${esc(c.span)}</p>
+    <p class="intro">${esc(c.intro)}</p>
+    <ol class="entries">${c.entries.map(([d,t,cs]) => `
+      <li class="entry"><time datetime="${d}">${fmt(d)}</time><p>${esc(t)}</p>
+        <div class="cites">${cs.map(([id,q]) => citeBtn(id,q)).join("")}</div></li>`).join("")}
+    </ol>
+  </div>`).join("");
+
+// next + fair
+$("#nextlist").innerHTML = D.next.map(([t,p]) => `<li>${esc(t)} <a href="#${p}" class="mono">see point ${D.points.findIndex(x=>x.id===p)+1}</a></li>`).join("");
+$("#fairlist").innerHTML = D.fair.map(([t,cs]) => `<li>${esc(t)} ${cs.map(([id,q]) => citeBtn(id,q)).join(" ")}</li>`).join("");
+
+// records
+const cited = new Set();
+D.points.forEach(p => p.cites.forEach(c => cited.add(c[0])));
+D.story.forEach(c => c.entries.forEach(e => e[2].forEach(x => cited.add(x[0]))));
+const recs = Object.entries(DOCS).sort((a,b) => (a[1].date||"").localeCompare(b[1].date||""));
+const kinds = ["All","Cited on this page","Email","Agendas & minutes"];
+let kind = "All";
+function recMatch(id,d){
+  if(kind==="Cited on this page") return cited.has(id);
+  if(kind==="Email") return d.kind==="Email";
+  if(kind==="Agendas & minutes") return d.kind!=="Email";
+  return true;
+}
+function renderRecs(){
+  const list = recs.filter(([id,d]) => recMatch(id,d));
+  $("#reccount").textContent = `${list.length} records`;
+  $("#reclist").innerHTML = list.map(([id,d]) => `
+    <button type="button" class="rec" data-doc="${id}">
+      <time datetime="${d.date}">${fmt(d.date)}</time>
+      <span class="t">${esc(d.title)}</span>
+      <span class="tag">${cited.has(id) ? "Cited" : ""}</span>
+      <span class="s">${esc(d.frm)} · ${esc(d.src)}</span>
+    </button>`).join("");
+}
+$("#filters").innerHTML = kinds.map(k => `<button type="button" class="chip" aria-pressed="${k===kind}" data-kind="${k}">${k}</button>`).join("");
+$("#filters").addEventListener("click", e => {
+  const b = e.target.closest(".chip"); if(!b) return;
+  kind = b.dataset.kind;
+  document.querySelectorAll(".chip").forEach(c => c.setAttribute("aria-pressed", c===b));
+  renderRecs();
+});
+renderRecs();
+
+// search
+const plain = s => s.toLowerCase().replace(/[\u2019\u2018]/g,"'").replace(/\s+/g," ");
+const docIndex = recs.map(([id,d]) => [id, plain(d.title+" "+d.frm+" "+d.text)]);
+function snippet(text, terms){
+  const t = text.replace(/\s+/g," "); const low = plain(t);
+  let at = -1; for(const w of terms){ at = low.indexOf(w); if(at>=0) break; }
+  if(at<0) return esc(t.slice(0,160))+"…";
+  const s = Math.max(0, at-80), e = Math.min(t.length, at+160);
+  let out = esc((s?"…":"")+t.slice(s,e)+(e<t.length?"…":""));
+  terms.forEach(w => { if(w.length>1) out = out.replace(new RegExp("("+w.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+")","ig"),"<mark>$1</mark>"); });
+  return out;
+}
+let lastQ = "";
+function runSearch(){
+  const q = $("#q").value.trim(); if(q===lastQ) return; lastQ = q;
+  const res = $("#results"), main = $("#main");
+  if(!q){ res.hidden = true; main.hidden = false; return; }
+  const terms = plain(q).split(" ").filter(Boolean);
+  const has = s => { const p = plain(s); return terms.every(w => p.includes(w)); };
+  const pts = D.points.filter(p => has(p.title+" "+p.plain+" "+p.why+" "+p.cites.map(c=>c[1]).join(" ")));
+  const ents = []; D.story.forEach(c => c.entries.forEach(e => { if(has(e[1]+" "+e[2].map(x=>x[1]).join(" "))) ents.push([c,e]); }));
+  const docs = docIndex.filter(([id,t]) => terms.every(w => t.includes(w))).map(([id]) => id);
+  res.innerHTML = `<p class="label">Results for “${esc(q)}”</p>
+   <div class="rgroup"><h3>Talking points (${pts.length})</h3>${pts.map(p => `<button type="button" class="hit" data-jump="${p.id}"><span class="meta">Point ${D.points.indexOf(p)+1}</span><div><b>${esc(p.title)}</b></div><div class="snip">${snippet(p.plain,terms)}</div></button>`).join("") || '<p class="empty">No talking points match.</p>'}</div>
+   <div class="rgroup"><h3>Story entries (${ents.length})</h3>${ents.map(([c,e]) => `<button type="button" class="hit" data-jump="${c.id}"><span class="meta">${fmt(e[0])} · ${esc(c.title)}</span><div class="snip">${snippet(e[1],terms)}</div></button>`).join("") || '<p class="empty">No story entries match.</p>'}</div>
+   <div class="rgroup"><h3>Records (${docs.length})</h3>${docs.slice(0,80).map(id => { const d = DOCS[id]; return `<button type="button" class="hit" data-doc="${id}" data-q=""><span class="meta">${fmt(d.date)} · ${esc(d.frm)} · ${esc(d.src)}</span><div><b>${esc(d.title)}</b></div><div class="snip">${snippet(d.text,terms)}</div></button>`; }).join("") || '<p class="empty">No records contain all of those words. Try fewer words.</p>'}${docs.length>80?`<p class="empty">Showing the first 80 of ${docs.length}. Add a word to narrow it down.</p>`:""}</div>`;
+  res.hidden = false; main.hidden = true;
+}
+let st; $("#q").addEventListener("input", () => { clearTimeout(st); st = setTimeout(runSearch, 120); });
+
+// reader with "back to where you were"
+let ret = null, open = false, pushed = false;
+const reader = $("#reader"), scrim = $("#scrim");
+function openDoc(id, q, trigger){
+  const d = DOCS[id]; if(!d) return;
+  ret = { y: window.scrollY, el: trigger, searchShown: !$("#results").hidden };
+  $("#rtitle").textContent = d.title;
+  $("#rmeta").innerHTML = [d.src, d.frm, fmt(d.date)].filter(Boolean).map(esc).map(s=>`<span>${s}</span>`).join("");
+  const o = $("#orig");
+  if(d.pdf){ o.href = d.pdf; o.hidden = false; $("#nopdf").hidden = true; } else { o.hidden = true; $("#nopdf").hidden = d.kind!=="Email"; }
+  const text = d.text; let html = esc(text), found = false;
+  if(q){ const m = qre(q).exec(text); if(m){ found = true; html = esc(text.slice(0,m.index)) + '<mark id="hit">' + esc(m[0]) + "</mark>" + esc(text.slice(m.index+m[0].length)); } }
+  $("#doctext").innerHTML = html;
+  $("#pull").hidden = !(q && found && q!=="R-14");
+  $("#pulltext").textContent = q ? "“" + q + "”" : "";
+  reader.hidden = false; scrim.hidden = false; open = true;
+  document.body.style.overflow = "hidden";
+  const body = $("#rbody"); body.scrollTop = 0;
+  requestAnimationFrame(() => {
+    const h = document.getElementById("hit");
+    if(h) body.scrollTop = Math.max(0, h.offsetTop - body.clientHeight*0.3);
+    $("#back").focus({preventScroll:true});
+  });
+  try { history.pushState({flockdoc:id}, ""); pushed = true; } catch(e){ pushed = false; }
+}
+function closeDoc(fromPop){
+  if(!open) return;
+  open = false; reader.hidden = true; scrim.hidden = true; document.body.style.overflow = "";
+  if(ret){
+    window.scrollTo(0, ret.y);
+    const el = ret.el;
+    if(el && document.body.contains(el)){ el.focus({preventScroll:true}); el.classList.remove("flash"); void el.offsetWidth; el.classList.add("flash"); }
+  }
+  if(!fromPop && pushed){ pushed = false; try { history.back(); } catch(e){} }
+}
+window.addEventListener("popstate", () => { if(open){ pushed = false; closeDoc(true); } });
+$("#back").addEventListener("click", () => closeDoc(false));
+scrim.addEventListener("click", () => closeDoc(false));
+document.addEventListener("keydown", e => { if(e.key==="Escape" && open) closeDoc(false); });
+
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-doc]");
+  if(b && !reader.contains(b)){ e.preventDefault(); openDoc(b.dataset.doc, b.dataset.q, b); return; }
+  const j = e.target.closest("[data-jump]");
+  if(j){ $("#q").value = ""; runSearch(); const t = document.getElementById(j.dataset.jump); if(t){ t.scrollIntoView({block:"start"}); t.classList.add("flash"); setTimeout(()=>t.classList.remove("flash"),1700); } }
+});
+})();
+</script>
