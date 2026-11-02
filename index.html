@@ -85,6 +85,24 @@ section,.point,.chapter,#top{scroll-margin-top:120px}
 .sechead h2{font-size:clamp(1.6rem,3.5vw,2.2rem)}
 .sechead p{margin:0;color:var(--muted);max-width:62ch}
 
+/* collapsible sections */
+.folds{display:flex;flex-direction:column;gap:12px;padding-bottom:40px}
+.folds section{padding-block:0}
+.fold{background:var(--surface);border:1px solid var(--rule);border-radius:10px}
+.fold>summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 16px;align-items:center;padding:18px 22px;border-radius:10px}
+.fold>summary::-webkit-details-marker{display:none}
+.fold>summary:hover{background:color-mix(in srgb,var(--surface) 88%,var(--accent))}
+.fold>summary .sechead{border-top:0;padding-top:0;margin:0}
+.fold>summary .sechead h2::after{content:"";display:inline-block;width:.42em;height:.42em;margin-left:.45em;border-right:3px solid var(--accent);border-bottom:3px solid var(--accent);transform:translateY(-.2em) rotate(45deg);transition:transform .2s}
+.fold[open]>summary .sechead h2::after{transform:translateY(0) rotate(225deg)}
+.fold>summary .sechead p:not(.label){font-size:.95rem}
+.foldcount{font-family:var(--mono);font-size:.78rem;color:var(--muted);white-space:nowrap;align-self:start;padding-top:2px}
+.fold[open]>summary{border-bottom:1px solid var(--rule);border-radius:10px 10px 0 0;margin-bottom:22px}
+.fold>:not(summary){margin-inline:22px}
+.fold>:last-child:not(summary){margin-bottom:24px}
+.fold .point,.fold .records,.fold .req{background:var(--paper)}
+@media (max-width:560px){.fold>summary{grid-template-columns:1fr;padding:16px}.foldcount{order:-1}.fold>:not(summary){margin-inline:14px}}
+
 /* points */
 .points{display:flex;flex-direction:column;gap:16px;counter-reset:pt}
 .point{background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:20px 22px;display:grid;grid-template-columns:3.2rem minmax(0,1fr);gap:4px 16px}
@@ -213,36 +231,38 @@ footer p{max-width:72ch}
     <p class="howto">Click any <span class="cite" style="cursor:default">source</span> button to open the record with the quoted words highlighted. Press <b>Back to where you were</b> (or your browser's back button) to return to the same spot.</p>
   </header>
 
-  <section id="points" class="wrap">
-    <div class="sechead"><p class="label">Ranked by how solid the paper trail is</p><h2>The strongest points</h2><p>Each point is backed by the Town's or Flock's own words. Lead with the first five.</p></div>
+  <div class="wrap folds">
+  <section id="points"><details class="fold">
+    <summary><div class="sechead"><p class="label">Ranked by how solid the paper trail is</p><h2>The strongest points</h2><p>Each point is backed by the Town's or Flock's own words. Lead with the first five.</p></div><span class="foldcount" id="n-points"></span></summary>
     <div class="points" id="pointlist"></div>
-  </section>
+  </details></section>
 
-  <section id="story" class="wrap">
-    <div class="sechead"><p class="label">April 2023 – July 2026</p><h2>The story, step by step</h2><p>Seven chapters, in date order, in plain language.</p></div>
+  <section id="story"><details class="fold">
+    <summary><div class="sechead"><p class="label">April 2023 – July 2026</p><h2>The story, step by step</h2><p>Seven chapters, in date order, in plain language.</p></div><span class="foldcount" id="n-story"></span></summary>
     <div class="chapters" id="chapters"></div>
-  </section>
+  </details></section>
 
-  <section id="records" class="wrap">
-    <div class="sechead"><p class="label">Searchable index</p><h2>All records</h2><p>Every substantive email thread in FOIA 20394 (duplicates and automated mailers removed), plus the agendas, minutes, and camera list. Use the search bar to search their full text.</p></div>
+  <section id="records"><details class="fold">
+    <summary><div class="sechead"><p class="label">Searchable index</p><h2>All records</h2><p>Every substantive email thread in FOIA 20394 (duplicates and automated mailers removed), plus the agendas, minutes, and camera list. Use the search bar to search their full text.</p></div><span class="foldcount" id="n-records"></span></summary>
     <div class="filters" id="filters"></div>
     <p class="count" id="reccount"></p>
     <div class="records" id="reclist"></div>
-  </section>
+  </details></section>
 
-  <section id="next" class="wrap">
-    <div class="sechead"><p class="label">Keep digging</p><h2>What to request next</h2><p>Gaps in this release that the next FOIA requests should fill.</p></div>
+  <section id="next"><details class="fold">
+    <summary><div class="sechead"><p class="label">Keep digging</p><h2>What to request next</h2><p>Gaps in this release that the next FOIA requests should fill.</p></div><span class="foldcount" id="n-next"></span></summary>
     <div class="twocol">
       <div><h3>Ask the Town for</h3><ol class="list" id="nextlist"></ol></div>
       <div><h3>What these records don't show</h3><ul class="list" id="fairlist"></ul></div>
     </div>
-  </section>
+  </details></section>
 
-  <section id="tracker" class="wrap">
-    <div class="sechead"><p class="label">Filed with the Town of Bluffton</p><h2>Request tracker</h2><p>Every FOIA request we know of about the Flock cameras, newest first, and where each one stands. Requesters are shown by first name and last initial only.</p></div>
+  <section id="tracker"><details class="fold">
+    <summary><div class="sechead"><p class="label">Filed with the Town of Bluffton</p><h2>Request tracker</h2><p>Every FOIA request we know of about the Flock cameras, newest first, and where each one stands. Requesters are shown by first name and last initial only.</p></div><span class="foldcount" id="n-tracker"></span></summary>
     <div class="reqsum" id="reqsum"></div>
     <div class="reqs" id="reqlist"></div>
-  </section>
+  </details></section>
+  </div>
 </main>
 
 <footer class="wrap">
@@ -450,11 +470,32 @@ $("#back").addEventListener("click", () => closeDoc(false));
 scrim.addEventListener("click", () => closeDoc(false));
 document.addEventListener("keydown", e => { if(e.key==="Escape" && open) closeDoc(false); });
 
+// collapsible sections: closed on load; anything that points inside one opens it first
+const counts = {points:`${D.points.length} points`, story:`${D.story.length} chapters`, records:`${recs.length} records`, next:`${D.next.length} requests to make`, tracker:`${REQS.length} filed`};
+Object.entries(counts).forEach(([k,v]) => { $("#n-"+k).textContent = v; });
+function reveal(el){
+  if(!el) return el;
+  const own = el.querySelector(":scope > details.fold"); if(own) own.open = true;
+  for(let d = el.closest("details"); d; d = d.parentElement.closest("details")) d.open = true;
+  return el;
+}
+function goTo(id){
+  const t = reveal(document.getElementById(id)); if(!t) return;
+  t.scrollIntoView({block:"start"});
+  if(!t.matches("section")){ t.classList.add("flash"); setTimeout(()=>t.classList.remove("flash"),1700); }
+}
+if(location.hash.length > 1) goTo(decodeURIComponent(location.hash.slice(1)));
+
 document.addEventListener("click", e => {
   const b = e.target.closest("[data-doc]");
   if(b && !reader.contains(b)){ e.preventDefault(); openDoc(b.dataset.doc, b.dataset.q, b); return; }
   const j = e.target.closest("[data-jump]");
-  if(j){ $("#q").value = ""; runSearch(); const t = document.getElementById(j.dataset.jump); if(t){ t.scrollIntoView({block:"start"}); t.classList.add("flash"); setTimeout(()=>t.classList.remove("flash"),1700); } }
+  if(j){ $("#q").value = ""; runSearch(); goTo(j.dataset.jump); return; }
+  const a = e.target.closest('a[href^="#"]');
+  if(a && a.getAttribute("href").length > 1){
+    const id = a.getAttribute("href").slice(1);
+    if(document.getElementById(id)){ e.preventDefault(); $("#q").value = ""; runSearch(); goTo(id); try { history.replaceState(history.state, "", "#"+id); } catch(err){} }
+  }
 });
 })();
 </script>
