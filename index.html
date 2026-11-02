@@ -174,7 +174,7 @@ section,.point,.chapter,#top{scroll-margin-top:120px}
 .req h3{font-size:1.25rem}
 .req .who{grid-column:1;color:var(--muted);font-size:.9rem}
 .req .state{grid-column:2;grid-row:1;align-self:start;font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;padding:3px 9px;border-radius:99px;border:1px solid currentColor;white-space:nowrap}
-.state.filed{color:var(--accent)} .state.paused{color:var(--alert)} .state.fulfilled,.state.closed{color:var(--muted)}
+.state.pending{color:var(--alert)} .state.complete{color:var(--accent)}
 .req .asked{grid-column:1/-1;margin:6px 0 0;padding-left:1.2em;max-width:70ch}
 .req .asked li+li{margin-top:4px}
 .req .due{grid-column:1/-1;margin:4px 0 0;font-weight:600;font-size:.92rem}
@@ -258,7 +258,7 @@ footer p{max-width:72ch}
   </details></section>
 
   <section id="tracker"><details class="fold">
-    <summary><div class="sechead"><p class="label">Filed with the Town of Bluffton</p><h2>Request tracker</h2><p>Every FOIA request we know of about the Flock cameras, newest first, and where each one stands. Requesters are shown by first name and last initial only.</p></div><span class="foldcount" id="n-tracker"></span></summary>
+    <summary><div class="sechead"><p class="label">Filed with the Town of Bluffton</p><h2>Request tracker</h2><p>Every FOIA request we know of about the Flock cameras, pending first and completed at the bottom. Requesters are shown by first name and last initial only.</p></div><span class="foldcount" id="n-tracker"></span></summary>
     <div class="reqsum" id="reqsum"></div>
     <div class="reqs" id="reqlist"></div>
   </details></section>
@@ -376,8 +376,9 @@ $("#filters").addEventListener("click", e => {
 renderRecs();
 
 // request tracker
-const REQS = (window.FOIA_REQUESTS || []).slice().sort((a,b) => b.filed.localeCompare(a.filed));
-const STATES = {filed:"Waiting on the Town", paused:"Clock paused", fulfilled:"Records received", closed:"Closed"};
+// pending first, complete at the bottom; newest first within each
+const STATES = {pending:"Pending", complete:"Complete"};
+const REQS = (window.FOIA_REQUESTS || []).slice().sort((a,b) => (a.status==="complete") - (b.status==="complete") || b.filed.localeCompare(a.filed));
 // SC FOIA: response within 10 business days, skipping weekends and legal holidays
 const HOLIDAYS = new Set(["2026-11-11","2026-11-26","2026-11-27","2026-12-24","2026-12-25","2026-12-28","2027-01-01","2027-01-18","2027-02-15"]);
 function dueDate(iso){
@@ -394,7 +395,7 @@ $("#reqlist").innerHTML = REQS.map((r,i) => `
     <span class="state ${r.status}">${STATES[r.status]||esc(r.status)}</span>
     <p class="who">Filed ${fmt(r.filed)} by ${esc(r.requester)} · ${esc(r.scope)}</p>
     <ul class="asked">${r.asked.map(a => `<li>${esc(a)}</li>`).join("")}</ul>
-    ${r.status==="filed" ? `<p class="due">Town's response ${dueDate(r.filed) < new Date().toISOString().slice(0,10) ? "was due" : "due"} by ${fmt(dueDate(r.filed))} (10 business days)</p>` : ""}
+    ${r.status==="pending" ? `<p class="due">Town's response ${dueDate(r.filed) < new Date().toISOString().slice(0,10) ? "was due" : "due"} by ${fmt(dueDate(r.filed))} (10 business days)</p>` : ""}
     <ol class="entries">${r.log.map(([d,t]) => `<li class="entry"><time datetime="${d}">${fmt(d)}</time><p>${esc(t)}</p></li>`).join("")}</ol>
   </article>`).join("");
 
@@ -471,7 +472,7 @@ scrim.addEventListener("click", () => closeDoc(false));
 document.addEventListener("keydown", e => { if(e.key==="Escape" && open) closeDoc(false); });
 
 // collapsible sections: closed on load; anything that points inside one opens it first
-const counts = {points:`${D.points.length} points`, story:`${D.story.length} chapters`, records:`${recs.length} records`, next:`${D.next.length} requests to make`, tracker:`${REQS.length} filed`};
+const counts = {points:`${D.points.length} points`, story:`${D.story.length} chapters`, records:`${recs.length} records`, next:`${D.next.length} requests to make`, tracker:`${REQS.filter(r => r.status==="pending").length} pending · ${REQS.filter(r => r.status==="complete").length} complete`};
 Object.entries(counts).forEach(([k,v]) => { $("#n-"+k).textContent = v; });
 function reveal(el){
   if(!el) return el;
