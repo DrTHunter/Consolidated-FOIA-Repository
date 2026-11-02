@@ -149,6 +149,21 @@ section,.point,.chapter,#top{scroll-margin-top:120px}
 .twocol{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:30px}
 @media (max-width:760px){.twocol{grid-template-columns:1fr}}
 .twocol h3{font-size:1.25rem;margin-bottom:12px}
+/* request tracker */
+.reqsum{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.reqs{display:flex;flex-direction:column;gap:14px}
+.req{background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:18px 22px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 16px}
+.req h3{font-size:1.25rem}
+.req .who{grid-column:1;color:var(--muted);font-size:.9rem}
+.req .state{grid-column:2;grid-row:1;align-self:start;font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;padding:3px 9px;border-radius:99px;border:1px solid currentColor;white-space:nowrap}
+.state.filed{color:var(--accent)} .state.paused{color:var(--alert)} .state.fulfilled,.state.closed{color:var(--muted)}
+.req .asked{grid-column:1/-1;margin:6px 0 0;padding-left:1.2em;max-width:70ch}
+.req .asked li+li{margin-top:4px}
+.req .due{grid-column:1/-1;margin:4px 0 0;font-weight:600;font-size:.92rem}
+.req .entries{grid-column:1/-1;margin-top:10px}
+.req .entry{padding-bottom:10px}
+.req .entry p{font-size:.92rem}
+@media (max-width:560px){.req{grid-template-columns:1fr}.req .state{grid-column:1;grid-row:auto;justify-self:start}}
 footer{padding-block:30px 60px;color:var(--muted);font-size:.88rem;border-top:1px solid var(--rule)}
 footer p{max-width:72ch}
 
@@ -181,7 +196,7 @@ footer p{max-width:72ch}
       <input id="q" type="search" placeholder="Search everything: SCDOT, HOA, password, FBI…" autocomplete="off" aria-label="Search the talking points, story, and all records">
     </label>
     <nav class="nav" aria-label="Sections">
-      <a href="#points">Top points</a><a href="#story">The story</a><a href="#records">All records</a><a href="#next">Next requests</a>
+      <a href="#points">Top points</a><a href="#story">The story</a><a href="#records">All records</a><a href="#next">Next requests</a><a href="#tracker">Request tracker</a>
     </nav>
   </div>
 </div>
@@ -222,6 +237,12 @@ footer p{max-width:72ch}
       <div><h3>What these records don't show</h3><ul class="list" id="fairlist"></ul></div>
     </div>
   </section>
+
+  <section id="tracker" class="wrap">
+    <div class="sechead"><p class="label">Filed with the Town of Bluffton</p><h2>Request tracker</h2><p>Every FOIA request we know of about the Flock cameras, newest first, and where each one stands. Requesters are shown by first name and last initial only.</p></div>
+    <div class="reqsum" id="reqsum"></div>
+    <div class="reqs" id="reqlist"></div>
+  </section>
 </main>
 
 <footer class="wrap">
@@ -246,6 +267,7 @@ footer p{max-width:72ch}
 </aside>
 
 <script src="data.js"></script>
+<script src="requests.js"></script>
 <script>
 (function(){
 const D = window.FLOCK, DOCS = D.docs;
@@ -333,6 +355,29 @@ $("#filters").addEventListener("click", e => {
 });
 renderRecs();
 
+// request tracker
+const REQS = (window.FOIA_REQUESTS || []).slice().sort((a,b) => b.filed.localeCompare(a.filed));
+const STATES = {filed:"Waiting on the Town", paused:"Clock paused", fulfilled:"Records received", closed:"Closed"};
+// SC FOIA: response within 10 business days, skipping weekends and legal holidays
+const HOLIDAYS = new Set(["2026-11-11","2026-11-26","2026-11-27","2026-12-24","2026-12-25","2026-12-28","2027-01-01","2027-01-18","2027-02-15"]);
+function dueDate(iso){
+  const d = new Date(iso+"T12:00:00Z"); let n = 0;
+  while(n < 10){ d.setUTCDate(d.getUTCDate()+1); const k = d.toISOString().slice(0,10), w = d.getUTCDay(); if(w && w!==6 && !HOLIDAYS.has(k)) n++; }
+  return d.toISOString().slice(0,10);
+}
+const reqTitle = r => (r.no ? "FOIA " + r.no : "Number not yet assigned") + " · " + r.dept;
+$("#reqsum").innerHTML = `<span class="chip" style="cursor:default">${REQS.length} requests</span>` +
+  Object.keys(STATES).map(s => [s, REQS.filter(r => r.status===s).length]).filter(x => x[1]).map(([s,n]) => `<span class="chip" style="cursor:default">${n} ${STATES[s].toLowerCase()}</span>`).join("");
+$("#reqlist").innerHTML = REQS.map((r,i) => `
+  <article class="req" id="req${i}">
+    <h3>${esc(reqTitle(r))}</h3>
+    <span class="state ${r.status}">${STATES[r.status]||esc(r.status)}</span>
+    <p class="who">Filed ${fmt(r.filed)} by ${esc(r.requester)} · ${esc(r.scope)}</p>
+    <ul class="asked">${r.asked.map(a => `<li>${esc(a)}</li>`).join("")}</ul>
+    ${r.status==="filed" ? `<p class="due">Town's response ${dueDate(r.filed) < new Date().toISOString().slice(0,10) ? "was due" : "due"} by ${fmt(dueDate(r.filed))} (10 business days)</p>` : ""}
+    <ol class="entries">${r.log.map(([d,t]) => `<li class="entry"><time datetime="${d}">${fmt(d)}</time><p>${esc(t)}</p></li>`).join("")}</ol>
+  </article>`).join("");
+
 // search
 const plain = s => s.toLowerCase().replace(/[\u2019\u2018]/g,"'").replace(/\s+/g," ");
 const docIndex = recs.map(([id,d]) => [id, plain(d.title+" "+d.frm+" "+d.text)]);
@@ -354,10 +399,12 @@ function runSearch(){
   const has = s => { const p = plain(s); return terms.every(w => p.includes(w)); };
   const pts = D.points.filter(p => has(p.title+" "+p.plain+" "+p.why+" "+p.cites.map(c=>c[1]).join(" ")));
   const ents = []; D.story.forEach(c => c.entries.forEach(e => { if(has(e[1]+" "+e[2].map(x=>x[1]).join(" "))) ents.push([c,e]); }));
+  const reqs = REQS.map((r,i) => [r,i]).filter(([r]) => has([reqTitle(r), r.requester, r.scope, ...r.asked, ...r.log.map(l=>l[1])].join(" ")));
   const docs = docIndex.filter(([id,t]) => terms.every(w => t.includes(w))).map(([id]) => id);
   res.innerHTML = `<p class="label">Results for “${esc(q)}”</p>
    <div class="rgroup"><h3>Talking points (${pts.length})</h3>${pts.map(p => `<button type="button" class="hit" data-jump="${p.id}"><span class="meta">Point ${D.points.indexOf(p)+1}</span><div><b>${esc(p.title)}</b></div><div class="snip">${snippet(p.plain,terms)}</div></button>`).join("") || '<p class="empty">No talking points match.</p>'}</div>
    <div class="rgroup"><h3>Story entries (${ents.length})</h3>${ents.map(([c,e]) => `<button type="button" class="hit" data-jump="${c.id}"><span class="meta">${fmt(e[0])} · ${esc(c.title)}</span><div class="snip">${snippet(e[1],terms)}</div></button>`).join("") || '<p class="empty">No story entries match.</p>'}</div>
+   ${reqs.length ? `<div class="rgroup"><h3>FOIA requests (${reqs.length})</h3>${reqs.map(([r,i]) => `<button type="button" class="hit" data-jump="req${i}"><span class="meta">Filed ${fmt(r.filed)} · ${esc(r.requester)}</span><div><b>${esc(reqTitle(r))}</b></div><div class="snip">${snippet(r.asked.join(" "),terms)}</div></button>`).join("")}</div>` : ""}
    <div class="rgroup"><h3>Records (${docs.length})</h3>${docs.slice(0,80).map(id => { const d = DOCS[id]; return `<button type="button" class="hit" data-doc="${id}" data-q=""><span class="meta">${fmt(d.date)} · ${esc(d.frm)} · ${esc(d.src)}</span><div><b>${esc(d.title)}</b></div><div class="snip">${snippet(d.text,terms)}</div></button>`; }).join("") || '<p class="empty">No records contain all of those words. Try fewer words.</p>'}${docs.length>80?`<p class="empty">Showing the first 80 of ${docs.length}. Add a word to narrow it down.</p>`:""}</div>`;
   res.hidden = false; main.hidden = true;
 }

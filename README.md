@@ -8,6 +8,7 @@ Open `index.html` in a browser (or turn on GitHub Pages for this repo) to get:
 - **The story, step by step**: seven chapters in date order, April 2023 to July 2026.
 - **All records**: a searchable index of 198 records.
 - **What to request next**: gaps the next FOIA requests should fill.
+- **Request tracker**: every known FOIA request on the cameras and where it stands. Edit `requests.js` by hand to add a request or update its status. Requesters are listed by first name and last initial only; leave out emails, addresses, and phone numbers.
 
 Every quote links to its source record, with the quoted words highlighted and a link to the original PDF. "Back to where you were" returns you to the same spot on the page.
 
